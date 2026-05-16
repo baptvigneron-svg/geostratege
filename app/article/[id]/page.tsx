@@ -16,11 +16,12 @@ function renderMarkdown(content: string) {
 
   while (i < lines.length) {
     const line = lines[i];
-
     if (line.startsWith("### ")) {
       elements.push(<h3 key={i}>{line.slice(4)}</h3>);
     } else if (line.startsWith("## ")) {
       elements.push(<h2 key={i}>{line.slice(3)}</h2>);
+    } else if (line.startsWith("# ")) {
+      elements.push(<h2 key={i}>{line.slice(2)}</h2>);
     } else if (line.trim() !== "") {
       elements.push(<p key={i}>{line}</p>);
     }
@@ -47,8 +48,13 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Économie mondiale": "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
 };
 
-export default function ArticlePage({ params }: { params: { id: string } }) {
-  const article = getArticleById(params.id);
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const article = getArticleById(id);
   if (!article) notFound();
 
   const colorClass =

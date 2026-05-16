@@ -5,13 +5,13 @@ import CategoryFilter from "@/components/CategoryFilter";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage({
+export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { categorie?: string };
+  searchParams: Promise<{ categorie?: string }>;
 }) {
+  const { categorie } = await searchParams;
   const all = getAllArticles();
-  const categorie = searchParams.categorie;
   const articles = categorie
     ? all.filter((a) => a.categorie === categorie)
     : all;
