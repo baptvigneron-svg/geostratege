@@ -77,13 +77,15 @@ export default function AdminPage() {
       try { data = JSON.parse(text); } catch { /* not JSON */ }
       if (!res.ok) {
         setResult({ ok: false, message: data.error ?? `Erreur ${res.status} : ${text.slice(0, 300)}` });
-      } else {
+      } else if (data.article) {
         setResult({
           ok: true,
           message: `Article « ${data.article.titre} » généré avec succès !`,
           articleId: data.article.id,
         });
         setSujet("");
+      } else {
+        setResult({ ok: false, message: "Réponse inattendue du serveur." });
       }
     } catch (err) {
       setResult({ ok: false, message: `Erreur réseau : ${err instanceof Error ? err.message : String(err)}` });
