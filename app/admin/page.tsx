@@ -73,19 +73,23 @@ export default function AdminPage() {
         body: JSON.stringify({ sujet: sujet.trim(), password: generatePassword }),
       });
       const text = await res.text();
-      let data: { error?: string; article?: { titre: string; id: string } } = {};
-      try { data = JSON.parse(text); } catch { /* not JSON */ }
       if (!res.ok) {
-        setResult({ ok: false, message: data.error ?? `Erreur ${res.status} : ${text.slice(0, 300)}` });
-      } else if (data.article) {
-        setResult({
-          ok: true,
-          message: `Article « ${data.article.titre} » généré avec succès !`,
-          articleId: data.article.id,
-        });
-        setSujet("");
+        let errorMsg = `Erreur ${res.status}`;
+        try { errorMsg = (JSON.parse(text) as { error?: string }).error ?? errorMsg; } catch { /* */ }
+        setResult({ ok: false, message: errorMsg });
       } else {
-        setResult({ ok: false, message: "Réponse inattendue du serveur." });
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const parsed = JSON.parse(text) as any;
+          setResult({
+            ok: true,
+            message: `Article « ${parsed.article.titre} » généré avec succès !`,
+            articleId: String(parsed.article.id),
+          });
+          setSujet("");
+        } catch {
+          setResult({ ok: false, message: "Réponse inattendue du serveur." });
+        }
       }
     } catch (err) {
       setResult({ ok: false, message: `Erreur réseau : ${err instanceof Error ? err.message : String(err)}` });
