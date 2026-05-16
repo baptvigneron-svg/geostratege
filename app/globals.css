@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0a0a;
+  --electric: #3b82f6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0a0a0a;
+  color: #e5e7eb;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 3px;
+}
+
+/* Prose styles pour le contenu markdown */
+.article-content h2 {
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f9fafb;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  border-left: 3px solid #3b82f6;
+  padding-left: 0.75rem;
+}
+
+.article-content h3 {
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #d1d5db;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-content p {
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+  color: #d1d5db;
+}
+
+/* Quiz transition */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.quiz-slide {
+  animation: slideIn 0.35s ease-out;
+}
+
+.quiz-fade {
+  animation: fadeIn 0.4s ease-out;
+}
