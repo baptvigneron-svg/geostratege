@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "15.3.2",
+    "next": "15.3.8",
     "@anthropic-ai/sdk": "^0.24.3",
     "react": "^18",
     "react-dom": "^18"
