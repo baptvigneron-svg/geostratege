@@ -76,7 +76,7 @@ npm run dev
    - Récupérer l'URL, la clé `anon`, la clé `service_role` et les chaînes de connexion
      PostgreSQL (pooler en mode transaction pour `DATABASE_URL`, connexion directe ou
      session pour `DIRECT_URL`).
-2. **Base** : `npm run db:deploy` (applique les migrations).
+2. **Base** : les migrations sont appliquées automatiquement à chaque build (`prisma migrate deploy`).
 3. **Vercel** : nouveau projet sur ce dépôt avec **Root Directory = `pilotage`**, région des
    fonctions `fra1`, et les variables de `.env.example`.
 
