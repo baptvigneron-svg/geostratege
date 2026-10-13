@@ -1,0 +1,15 @@
+export const AUDIT_LABELS: Record<string, string> = {
+  "organization.create": "a créé l'espace",
+  "organization.rename": "a renommé l'entreprise",
+  "team.create": "a créé une équipe",
+  "team.update": "a modifié une équipe",
+  "team.delete": "a supprimé une équipe",
+  "team.member.add": "a ajouté un membre à une équipe",
+  "team.member.remove": "a retiré un membre d'une équipe",
+  "invitation.create": "a créé une invitation",
+  "invitation.revoke": "a annulé une invitation",
+  "invitation.accept": "a rejoint l'entreprise",
+  "member.role": "a changé un rôle",
+  "member.remove": "a retiré un membre",
+  "member.leave": "a quitté l'entreprise",
+};

@@ -1,0 +1,123 @@
+// Modèle de données du socle multi-entreprises.
+// Toute donnée métier est rattachée à une Organization : c'est la frontière
+// d'isolation entre clients (voir src/lib/access.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  ANIMATEUR
+  CONTRIBUTEUR
+  LECTEUR
+}
+
+// Miroir local d'un compte Supabase Auth (même id).
+model User {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  memberships     Membership[]
+  teamMemberships TeamMember[]
+  invitationsSent Invitation[] @relation("InvitedBy")
+  auditLogs       AuditLog[]
+}
+
+model Organization {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  memberships Membership[]
+  teams       Team[]
+  invitations Invitation[]
+  auditLogs   AuditLog[]
+}
+
+model Membership {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @db.Uuid
+  organizationId String   @db.Uuid
+  role           Role
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
+// Équipes organisées en arbre : sert aux escalades (équipe -> équipe parente).
+model Team {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @db.Uuid
+  parentId       String?  @db.Uuid
+  name           String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent       Team?        @relation("TeamTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children     Team[]       @relation("TeamTree")
+  members      TeamMember[]
+
+  @@index([organizationId])
+  @@index([parentId])
+}
+
+model TeamMember {
+  teamId String @db.Uuid
+  userId String @db.Uuid
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+  @@index([userId])
+}
+
+// Pas d'envoi d'e-mail : l'admin copie le lien d'invitation et le transmet.
+// Seul le hash du jeton est stocké.
+model Invitation {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @db.Uuid
+  email          String
+  role           Role
+  tokenHash      String    @unique
+  invitedById    String?   @db.Uuid
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User?        @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+}
+
+// Journal d'audit (RGPD et traçabilité). actorId passe à null si le compte est supprimé.
+model AuditLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @db.Uuid
+  actorId        String?  @db.Uuid
+  action         String
+  entityType     String
+  entityId       String?
+  data           Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor        User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+}
